@@ -7,9 +7,8 @@ import numpy as np
 from synthetic_data.synthetic_data import make_tabular_data
 
 import tensorflow as tf
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model 
 from tensorflow.keras import layers, losses
-
 
 
 def data_generator_sklearn():
@@ -42,27 +41,26 @@ def data_generator_synthetic_data_capital1():
 
     DataID = shortuuid.uuid()
     DataGenAlgo = 'synthetic_data'
-    Sample_size = 1000
+    Sample_size = 2000
     nclass = 2
-    GenRandomState = 1234
+    GenRandomState = 1
     nInfo = 10
     nFeature = 16
-    nRedun = 4
-    nNusiance = 2
-    expr2 = "x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10"
-    col_map = {"x1": 0, "x2": 1,"x3":-1, "x4": 0, "x5": 1, "x6": -1, "x7": 0, "x8": 1,"x9":-1, "x10": -1}
-    cov = np.array([[1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-       [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]])
-    pthresh = 0.55
-
+    nRedun = 2
+    nNusiance = 4
+    pthresh = 0.75
+    expr2 ="x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10"
+    col_map = {"x1": 1, "x2": 0,"x3":1, "x4": 1, "x5": 0, "x6": 1, "x7": 1, "x8": 0,"x9":1, "x10": 0}
+    cov = np.array([[1. , 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+       [0.8, 1. , 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+       [0.8, 0.8, 1. , 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+       [0.8, 0.8, 0.8, 1. , 0.8, 0.8, 0.8, 0.8, 0.8, 0.8],
+       [0.8, 0.8, 0.8, 0.8, 1. , 0.8, 0.8, 0.8, 0.8, 0.8],
+       [0.8, 0.8, 0.8, 0.8, 0.8, 1. , 0.8, 0.8, 0.8, 0.8],
+       [0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1. , 0.8, 0.8, 0.8],
+       [0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1. , 0.8, 0.8],
+       [0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1. , 0.8],
+       [0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1. ]])
 
     X, y_reg, y_prob, y_label = make_tabular_data(n_samples=Sample_size, n_informative=nInfo, n_redundant=nRedun ,n_nuisance=nNusiance, cov=cov, n_classes=nclass, col_map=col_map, expr=expr2, p_thresh=pthresh, seed=GenRandomState)
 
@@ -89,7 +87,12 @@ class Autoencoder(Model):
         self.latent_dim = latent_dim
         self.shape = shape
         self.encoder = tf.keras.Sequential([
+            layers.Input(shape = shape),
             layers.Flatten(),
+            layers.Dense(32, activation = 'sigmoid'),
+            layers.Dense(16, activation = 'relu'),
+            layers.Dense(64, activation = 'relu'),
+            layers.Dense(32, activation = 'sigmoid'),
             layers.Dense(latent_dim, activation='relu'),
         ])
         self.decoder = tf.keras.Sequential([
@@ -107,9 +110,9 @@ class Autoencoder(Model):
 def autoencoder_algo(q_num, X_train, X_test):
     shape = X_test.shape[1:]
     autoencoder = Autoencoder(latent_dim=q_num, shape=shape)
-
+    #autoencoder.compile(optimizer = 'adam', loss= losses.BinaryCrossentropy())
     autoencoder.compile(optimizer = 'adam', loss = losses.MeanSquaredError())
-    autoencoder.fit(X_train,X_train, epochs = 10, shuffle = True, validation_data = (X_test,X_test))
+    autoencoder.fit(X_train,X_train, epochs = 80, shuffle = True, validation_data = (X_test,X_test))
 
     X_train, X_test = autoencoder.encoder(X_train).numpy(), autoencoder.encoder(X_test).numpy()
 

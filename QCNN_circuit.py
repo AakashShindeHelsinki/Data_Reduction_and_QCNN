@@ -3,7 +3,7 @@ import Ansatz
 import Embedding 
 
 #change if necessary
-#Convolutinal 
+#Convolutional
 def Conv16q(U, params):
     for i in range(0,8):
         U(params,wires=[i,15-i])
