@@ -1,5 +1,6 @@
 from sklearn.datasets import make_blobs, make_classification, make_gaussian_quantiles
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, TruncatedSVD
+from sklearn.manifold import TSNE
 from sklearn.model_selection import train_test_split
 import csv
 import shortuuid
@@ -46,8 +47,8 @@ def data_generator_synthetic_data_capital1():
     GenRandomState = 1
     nInfo = 10
     nFeature = 16
-    nRedun = 2
-    nNusiance = 4
+    nRedun = 0
+    nNusiance = 6
     pthresh = 0.75
     expr2 ="x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10"
     col_map = {"x1": 1, "x2": 0,"x3":1, "x4": 1, "x5": 0, "x6": 1, "x7": 1, "x8": 0,"x9":1, "x10": 0}
@@ -112,12 +113,25 @@ def autoencoder_algo(q_num, X_train, X_test):
     autoencoder = Autoencoder(latent_dim=q_num, shape=shape)
     #autoencoder.compile(optimizer = 'adam', loss= losses.BinaryCrossentropy())
     autoencoder.compile(optimizer = 'adam', loss = losses.MeanSquaredError())
-    autoencoder.fit(X_train,X_train, epochs = 80, shuffle = True, validation_data = (X_test,X_test))
+    autoencoder.fit(X_train,X_train, epochs = 60, shuffle = True, validation_data = (X_test,X_test))
 
     X_train, X_test = autoencoder.encoder(X_train).numpy(), autoencoder.encoder(X_test).numpy()
 
     return X_train, X_test
 
+def svd_algo(q_num, X_train, X_test):
+    svd = TruncatedSVD(n_components=q_num)
+    X_train = svd.fit_transform(X_train)
+    X_test = svd.fit_transform(X_test)
+    
+    return X_train,X_test
+
+def tSNE_algo(q_num, X_train, X_test):
+    tsne = TSNE(n_components=q_num,learning_rate=10,init='pca',perplexity=50, max_iter = 10000, n_iter_without_progress=300,method='exact')
+    X_train = tsne.fit_transform(X_train)
+    X_test = tsne.fit_transform(X_test)
+    
+    return X_train, X_test
 
 def data_load_and_process(q_num, data_gen, data_redu = 'no_redu' ):
     traintestSplit = 0.2
@@ -136,11 +150,17 @@ def data_load_and_process(q_num, data_gen, data_redu = 'no_redu' ):
 
     X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = traintestSplit, shuffle=Shuf, random_state=SplitRandomState)
 
+
+
     
     if data_redu == 'pca':
         X_train, X_test = pca_algo(q_num, X_train, X_test)
     elif data_redu == 'autoencode':
         X_train, X_test = autoencoder_algo(q_num, X_train, X_test)
+    elif data_redu == 'svd':
+        X_train, X_test = svd_algo(q_num, X_train, X_test)
+    elif data_redu == 'tsne':
+        X_train, X_test = tSNE_algo(q_num, X_train, X_test)
 
     
     update_vals = {'X_train' : X_train,'X_test' : X_test,'Y_train' : Y_train, 'Y_test' : Y_test,

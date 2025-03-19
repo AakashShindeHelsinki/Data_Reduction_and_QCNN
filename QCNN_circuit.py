@@ -432,9 +432,8 @@ def QCNN(x, params, U, U_params,q_num = 16,embedding_type='Amplitude',cost_fn='c
 
 
 
-
-
-    dev = qml.device('default.qubit', wires = q_num)
+    dev_str_val = 'default.qubit'
+    dev = qml.device(dev_str_val, wires = q_num)
     @qml.qnode(dev)
     def Circuit_Run(x,params, Anz, Q_model,U_params,q_num,embedding_type,cost_fn):
         #DATA Embedding

@@ -29,7 +29,7 @@ def cost(params, X, Y, U, U_params, q_num,embedding_type, cost_fn='mse'):
     return loss
 
 # Circuit training parameters
-steps = 301
+steps = 300
 learning_rate = 0.01
 batch_size = 25
 def circuit_training(X_train, Y_train, U, U_params, q_num, embedding_type, cost_fn):
@@ -55,7 +55,7 @@ def circuit_training(X_train, Y_train, U, U_params, q_num, embedding_type, cost_
         Y_batch = [Y_train[i] for i in batch_index]
         params, cost_new = opt.step_and_cost(lambda v: cost(v, X_batch, Y_batch, U, U_params, q_num, embedding_type,cost_fn), params)
         loss_history.append(cost_new)
-        if it % 10 == 0:
-            print("iteration: ", it, " cost: ", cost_new)
+        if (it+1) % 10 == 0:
+            print("iteration: ", it+1, " cost: ", cost_new)
     return loss_history, params, steps
 
