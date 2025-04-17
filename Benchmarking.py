@@ -5,6 +5,8 @@ import numpy as np
 import csv
 from sklearn.metrics import precision_score, accuracy_score, f1_score, recall_score
 
+
+
 #with scikitlearn
 def evaluation(predictions, labels):
     accuracy = accuracy_score(predictions, labels)
@@ -39,7 +41,7 @@ def Benchmarking(Unitaries, U_num_params, data_gen, Embedding,cost_fn):
                     else:
                         pred_array.append(1)
             else:
-                for pred_a in range(0,len(predictions)):  #Check once
+                for pred_a in range(0,len(predictions)):  
                     if predictions[pred_a] < 0:
                         predictions[pred_a] = 0
                     else:

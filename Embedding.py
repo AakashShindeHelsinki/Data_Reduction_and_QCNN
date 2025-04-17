@@ -10,4 +10,4 @@ def data_embedding(X, q_num, type):
     elif type == 'Amplitude':
         AmplitudeEmbedding(X, wires=range(q_num), normalize=True, pad_with=1)
     elif type == 'IQP':
-        IQPEmbedding(X,wires=range(q_num),n_repeats=2)
+        IQPEmbedding(X,wires=range(q_num),n_repeats=1)

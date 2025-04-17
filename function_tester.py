@@ -3,9 +3,9 @@ import Training
 import QCNN_circuit
 
 def dataset_creation_check():
-    Embeddings = [['autoencode',12]]#,['pca',16],['pca',14],['pca',12],['pca',10],['pca',8]]
+    Embeddings = [['no_redu',16]]#,['pca',16],['pca',14],['pca',12],['pca',10],['pca',8]]
     for Embed in Embeddings:
-        X_train, Y_train, X_test, Y_test, DataID = data.data_load_and_process(q_num = Embed[1], data_gen = 'capital1_synthetic_data' ,data_redu = Embed[0])
+        X_train, Y_train, X_test, Y_test, DataID = data.data_load_and_process(q_num = Embed[1], data_gen = '4x4_img_data' ,data_redu = Embed[0])
         print(f"Length of X_train value 0 : {len(X_train[0])}")
  
         print("X_train:")

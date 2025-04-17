@@ -11,6 +11,7 @@ import tensorflow as tf
 from tensorflow.keras.models import Model 
 from tensorflow.keras import layers, losses
 
+from Data_Generator.dataval_constructor import dataval_constructor
 
 def data_generator_sklearn():
     DataID = shortuuid.uuid()
@@ -71,6 +72,21 @@ def data_generator_synthetic_data_capital1():
                      'covariance matrix':cov, 'y regression': y_reg, 'y probabilities': y_prob}
 
     y = np.round(y_prob).astype(int)
+    return X,y, DataID, data_file
+
+def pseudoimage_dataset_generator():
+    DataID = shortuuid.uuid()
+    DataGenAlgo = '4x4_pseudoImg_data'    
+    Sample_size = 5000
+    nclass = 2
+    pixel_diff = 0.90 # Greater than 0, Less than 1
+    greator_val = None # Linear / Diagonal
+    data_percent_split=0.5 # Between 0 and 1 needs greator val argument else useless
+    shuffle = True # True / False
+    X,y = dataval_constructor(number_of_value=Sample_size, pixel_diff=pixel_diff, greator_val=greator_val, data_percent_split=data_percent_split, shuffle=shuffle)
+    data_file = {'DataID':DataID,'DataGenAlgo':DataGenAlgo,'Sample_size':Sample_size,'nclass':nclass,
+                 'PixelDifference': pixel_diff, 'GreatorVal': greator_val, 'DataPercentOffset':data_percent_split}
+      
     return X,y, DataID, data_file
 
 
@@ -139,14 +155,15 @@ def data_load_and_process(q_num, data_gen, data_redu = 'no_redu' ):
     SplitRandomState = 42
 
     field_names = ['DataID','DataGenAlgo','Sample_size','nclass','GenRandomState','nInfo','nFeature','nRedun','nRep','nCluster','classSep',
-                   'nNusiance','expression','pthreshold', 'Col-Map', 'covariance matrix', 'y regression', 'y probabilities',
-                   'train-testSplit','Shuf','SplitRandomState','X_train','Y_train','X_test','Y_test']
+                   'nNusiance','expression','pthreshold', 'Col-Map', 'covariance matrix', 'y regression', 'y probabilities', 'PixelDifference', 
+                   'GreatorVal', 'DataPercentOffset', 'train-testSplit','Shuf','SplitRandomState','X_train','Y_train','X_test','Y_test']
 
     if data_gen == 'sklearn_make_class':
         X, y, DataID, data_file = data_generator_sklearn()
     elif data_gen == 'capital1_synthetic_data':
         X, y, DataID, data_file = data_generator_synthetic_data_capital1()
-
+    elif data_gen == '4x4_img_data':
+        X, y, DataID, data_file = pseudoimage_dataset_generator()
 
     X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size = traintestSplit, shuffle=Shuf, random_state=SplitRandomState)
 

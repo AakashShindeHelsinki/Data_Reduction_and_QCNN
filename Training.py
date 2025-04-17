@@ -31,7 +31,7 @@ def cost(params, X, Y, U, U_params, q_num,embedding_type, cost_fn='mse'):
 # Circuit training parameters
 steps = 300
 learning_rate = 0.01
-batch_size = 25
+batch_size = 15
 def circuit_training(X_train, Y_train, U, U_params, q_num, embedding_type, cost_fn):
     if q_num >=10 :
         if U == 'U_SU4_no_pooling' or U == 'U_SU4_1D' or U == 'U_9_1D':
